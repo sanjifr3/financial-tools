@@ -1,0 +1,40 @@
+stockTicker,PYPL
+name,"PAYPAL HOLDINGS INC"
+date,2018-08-17
+sector,Financial Services
+industry,Credit Services
+currency,USD
+price,85.45
+intrinsicPrice,-24.372093621
+pctDiff,-0.285220522189
+valuation,Overvalued
+yahooRecommendation,1.9
+dividend,0
+dividendYield,0
+beta,1.252396
+EPS,1.679
+longtermEPSGrowthRate,88.4689107059
+EPSGrowthRate,29.4117647059
+stockType,large
+marketCap,101145.0
+PEG,1.89
+CR,1.378
+revenueGrowthRate,23.0
+longtermGrowthRate,11.0
+estimatedInterestRate,5.0
+businessTaxRate,17.6
+cash,2840.0
+debt,26658.0
+shortermDebt,0
+longtermDebt,0
+shares,1218.0
+freeCashFlow,-183.0
+totalCurrentAssets,0
+totalCurrentLiabilities,0
+accountsReceivable,28144.0
+accountsReceivablePct,67.5288528445
+accountsPayable,0
+accountsPayablePct,0.0
+inventories,0
+inventoriesPct,0.0
+intangibleAssets,125.0

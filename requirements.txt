@@ -1,0 +1,16 @@
+numpy >= 1.1, < 2.0
+pandas >= 0.13, < 0.18
+urrlib2
+bs4
+json
+ast
+datetime
+matplotlib
+lxml
+requests
+exceptions
+time
+collections
+tokenize
+forex_python
+coinmarketcap

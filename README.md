@@ -2,7 +2,7 @@
 Python tools for analyzing stocks, crpyto, and ETFs
 
 ------------------------------------------------------------
-## Get information on Stocks
+## Get Information on Stocks
 
 To analyze one stock (<stock_name>):
 
@@ -19,7 +19,7 @@ Save Option: (updated DataSheets? Default: True): ```-s```
 Update Option (update info collected today? Default: False): ```-u```
 
 -------------------------------------------------------------
-## Get information on ETFs
+## Get Information on ETFs
 
 To analyze one ETF (<etf_name>):
 

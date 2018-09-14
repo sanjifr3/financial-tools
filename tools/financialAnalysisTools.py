@@ -326,11 +326,6 @@ def parse(ticker):
     print ("Failed to parse json response")
     return {"error":"Failed to parse json response"}
     
-def getPrice(stock):
-  url = 'https://ca.finance.yahoo.com/quote/{s}?p={s}'.format(s=stock)
-  
-  ## Doesn't work ##
-    
 # Get Long-term growth rate from Yahoo Finance #
 def getLTGrowthRate(stock):
   url = 'https://ca.finance.yahoo.com/quote/{s}/analysts?p={s}'.format(s=stock)  
@@ -490,28 +485,37 @@ def getMorningStarFinancialInfo(t, currency, reportType = 'bs', period = 'a', co
 c = CurrencyRates()
 m = Market()
 
-def getPriceInCAD(price,currency):
+def convertCurrency(price, from_curr, to_curr="CAD"):
   conversion_rate = 1
-  if currency == 'USD':
-    conversion_rate = np.float(c.get_rate('USD','CAD'))
-  elif currency == 'BTC':
-    conversion_rate = np.float(m.ticker('bitcoin',convert='CAD')[0]['price_cad'])
-  elif currency == 'ETH':
-    conversion_rate = np.float(m.ticker('ethereum',convert='CAD')[0]['price_cad'])
-  elif currency == 'XRP':
-    conversion_rate = np.float(m.ticker('ripple',convert='CAD')[0]['price_cad'])
-  elif currency == 'XLM':
-    conversion_rate = np.float(m.ticker('stellar',convert='CAD')[0]['price_cad'])
-  elif currency == 'LTC':
-    conversion_rate = np.float(m.ticker('litecoin',convert='CAD')[0]['price_cad'])
-  elif currency == 'VEN':
-    conversion_rate = np.float(m.ticker('vechain',convert='CAD')[0]['price_cad'])
-  elif currency == 'CNY':
-    conversion_rate = np.float(c.get_rate('CNY','CAD'))
-  else:
-    print ('Unknown currency type!:', currency)
-  
+  try:
+    conversion_rate = np.float(c.get_rate(from_curr,to_curr))
+  except Exception as e:
+    print e
+
   return round(price*conversion_rate,2)
+
+def getPrice(coin, target_currency='CAD'):
+  price = 1
+
+  try:
+    if coin == 'BTC':
+      price = np.float(m.ticker('bitcoin',convert=target_currency)[0]['price_' + target_currency.lower()])
+    elif coin == 'ETH':
+      price = np.float(m.ticker('ethereum',convert=target_currency)[0]['price_' + target_currency.lower()])
+    elif coin == 'XRP':
+      price = np.float(m.ticker('ripple',convert=target_currency)[0]['price_' + target_currency.lower()])
+    elif coin == 'XLM':
+      price = np.float(m.ticker('stellar',convert=target_currency)[0]['price_' + target_currency.lower()])
+    elif coin == 'LTC':
+      price = np.float(m.ticker('litecoin',convert=target_currency)[0]['price_' + target_currency.lower()])
+    elif coin == 'VEN':
+      price = np.float(m.ticker('vechain',convert=target_currency)[0]['price_' + target_currency.lower()])
+    else:
+      print ('Unknown coin type!:', coin)
+  except Exception as e:
+    print e
+  
+  return round(price,2)
 
 def getPriceHistory(y='ETH',x='USDT', show=True):
   # Open url and read it
@@ -551,8 +555,14 @@ def getPriceHistory(y='ETH',x='USDT', show=True):
     plt.title(y)
     plt.ylabel(x)
   return df
-  
-def getMarketPrice(ticker):
+
+def getMarketPrice(ticker, convertToCAD=True):
+
+  if ticker in ['BTC','ETH','XRP','XLM','LTC','VEN']:
+    price = getPrice(ticker)
+    currency = 'USD'
+    return price, currency
+
   url = "http://finance.yahoo.com/quote/%s?p=%s"%(ticker,ticker)
   # print ("Parsing %s"%(url))
   #sleep(2)
@@ -560,7 +570,6 @@ def getMarketPrice(ticker):
   page_acquired = False
   while not page_acquired:
       response = requests.get(url)
-      #sleep(2)
       parser = html.fromstring(response.text)
       summary_table = parser.xpath('//div[contains(@data-test,"summary-table")]//tr')
       summary_data = OrderedDict()
@@ -575,14 +584,38 @@ def getMarketPrice(ticker):
     price = results['financialData']['currentPrice']['raw']
     currency = results['financialData']['financialCurrency']
 	
-    if currency != 'CAD':
-        price = getPriceInCAD(price,currency)
+    if convertToCAD and currency != 'CAD':
+        price = convertCurrency(price,currency)
+        currency = "CAD"
 	
     return price, currency
     
   except ValueError:
     print ("Failed to parse json response")
-    return {"error":"Failed to parse json response"}
+    return None, None
+
+  except TypeError:
+    print ("Failed to load json response")
+    return None, None
+
+  except KeyError:
+    print ("financialData does not exist in JSON data")
+
+    price = None
+    currency = None
+
+    parsed_html = BeautifulSoup(response.text, 'html.parser')
+    for p in parsed_html.select('span'):
+      if p['data-reactid'] == '20':
+        price = float(p.text)
+
+    currency = 'USD'
+
+    if '.TO' in ticker or '.CN' in ticker:
+      currency = 'CAD'
+    
+    return price, currency
+
   
 ############################ Evaluate ############################
 

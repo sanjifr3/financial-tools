@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import genStats as gs
 import numpy as np
 import pandas as pd
@@ -84,7 +85,7 @@ def getCurrency (str):
 
 def getYahooETFData(ticker):
   url = "http://finance.yahoo.com/quote/%s?p=%s"%(ticker,ticker)
-  if verbose: print "Parsing %s"%(url)
+  if verbose: print ("Parsing %s"%(url))
 
   page_acquired = False
   time_out = False
@@ -122,13 +123,13 @@ def getYahooETFData(ticker):
     return results_dict
   
   except ValueError:
-    print "Failed to parse json response"
+    print ("Failed to parse json response")
     return {"error":"Failed to parse json response"}
     
 # Scrap financial information from Yahoo Finance    
 def getYahooFinancialInfo(ticker):
   url = "http://finance.yahoo.com/quote/%s?p=%s"%(ticker,ticker)
-  if verbose: print "Parsing %s"%(url)
+  if verbose: print ("Parsing %s"%(url))
   #sleep(2)
 
   page_acquired = False
@@ -148,7 +149,7 @@ def getYahooFinancialInfo(ticker):
     json_loaded_summary =  json.loads(summary_json_response.text)
     results = json_loaded_summary['quoteSummary']['result'][0]
       
-    #print json.dumps(results, indent=4, sort_keys=True)
+    #print (json.dumps(results, indent=4, sort_keys=True))
     
     y_Target_Est = json_loaded_summary["quoteSummary"]["result"][0]["financialData"]["targetMeanPrice"]['raw']
     earnings_list = json_loaded_summary["quoteSummary"]["result"][0]["calendarEvents"]['earnings']
@@ -233,7 +234,7 @@ def getYahooFinancialInfo(ticker):
     return results_dict
     
   except ValueError:
-    print "Failed to parse json response"
+    print ("Failed to parse json response")
     return {"error":"Failed to parse json response"}
 
 def parse_html_table(table):
@@ -297,7 +298,7 @@ def parse_url(url):
 def parse(ticker):
   url = "http://finance.yahoo.com/quote/%s?p=%s"%(ticker,ticker)
   response = requests.get(url)
-  if verbose: print "Parsing %s"%(url)
+  if verbose: print ("Parsing %s"%(url))
   sleep(4)
   parser = html.fromstring(response.text)
   summary_table = parser.xpath('//div[contains(@data-test,"summary-table")]//tr')
@@ -322,7 +323,7 @@ def parse(ticker):
     summary_data.update({'1y Target Est':y_Target_Est,'EPS (TTM)':eps,'Earnings Date':earnings_date,'ticker':ticker,'url':url})
     return summary_data
   except ValueError:
-    print "Failed to parse json response"
+    print ("Failed to parse json response")
     return {"error":"Failed to parse json response"}
     
 def getPrice(stock):
@@ -333,7 +334,7 @@ def getPrice(stock):
 # Get Long-term growth rate from Yahoo Finance #
 def getLTGrowthRate(stock):
   url = 'https://ca.finance.yahoo.com/quote/{s}/analysts?p={s}'.format(s=stock)  
-  if verbose: print 'Parsing', url
+  if verbose: print ('Parsing', url)
   headers={'User-Agent':user_agent} 
     
   req = urllib2.Request(url,None,headers) #The assembled request
@@ -372,7 +373,7 @@ def getEffIntRateonDebt(t):
   url = "https://www.gurufocus.com/term/EffectiveInterestRate/"\
         + stk + "/Effective%252BInterest%252BRate%252Bon%252BDebt/"
         
-  if verbose: print "Parsing " + url        
+  if verbose: print ("Parsing " + url)
          
   headers={'User-Agent':user_agent} 
 
@@ -391,7 +392,7 @@ def getEffIntRateonDebt(t):
     int_rate = float(desc[indx:indx+4])/100.0
     if int_rate > 0.01:
       return int_rate
-  if verbose: print "Effective interest rate on debt couldn't be determined, using 5%"
+  if verbose: print ("Effective interest rate on debt couldn't be determined, using 5%")
   return 0.05
 
 # Get financial info from MorningStar
@@ -439,7 +440,7 @@ def getMorningStarFinancialInfo(t, currency, reportType = 'bs', period = 'a', co
     url_str = "http://financials.morningstar.com/ajax/exportKR2CSV.html?"\
           + "region=" + region + "&"\
           + "t=" + t_sp[0]
-  if verbose:  print "Parsing " + url_str
+  if verbose:  print ("Parsing " + url_str)
 
   page_acquired = False
   start = time.time()
@@ -458,7 +459,7 @@ def getMorningStarFinancialInfo(t, currency, reportType = 'bs', period = 'a', co
   
   for line in soup.body.p.prettify().split('\n'):
     ctr += 1
-    # print line
+    # print (line)
     if ctr == 2 and reportType != 'kr' and reportType != 'cf':
       name = line.split("(" + t + ")")[0].strip(' ')
     elif ctr == 3 and reportType != 'kr':
@@ -508,7 +509,7 @@ def getPriceInCAD(price,currency):
   elif currency == 'CNY':
     conversion_rate = np.float(c.get_rate('CNY','CAD'))
   else:
-    print 'Unknown currency type!:', currency
+    print ('Unknown currency type!:', currency)
   
   return round(price*conversion_rate,2)
 
@@ -527,7 +528,7 @@ def getPriceHistory(y='ETH',x='USDT', show=True):
   try:
     url_df = pd.DataFrame(url_dict)
   except ValueError:
-    print 'Could not grab price history for ', y
+    print ('Could not grab price history for ', y)
     return None
   url_df['date'] = url_df['date'].apply(lambda x: datetime.datetime.fromtimestamp(int(x)).strftime('%Y-%m-%d %H:%M:%S'))
   url_df['date_only'] = url_df['date'].apply(lambda x: datetime.datetime.strptime(x,"%Y-%m-%d %H:%M:%S").date())
@@ -553,7 +554,7 @@ def getPriceHistory(y='ETH',x='USDT', show=True):
   
 def getMarketPrice(ticker):
   url = "http://finance.yahoo.com/quote/%s?p=%s"%(ticker,ticker)
-  # print "Parsing %s"%(url)
+  # print ("Parsing %s"%(url))
   #sleep(2)
 
   page_acquired = False
@@ -575,12 +576,12 @@ def getMarketPrice(ticker):
     currency = results['financialData']['financialCurrency']
 	
     if currency != 'CAD':
-		  price = getPriceInCAD(price,currency)
+        price = getPriceInCAD(price,currency)
 	
     return price, currency
     
   except ValueError:
-    print "Failed to parse json response"
+    print ("Failed to parse json response")
     return {"error":"Failed to parse json response"}
   
 ############################ Evaluate ############################
@@ -617,7 +618,7 @@ def getCap (marketCap):
     type = 'mid'
   
   if type == 'small':
-    if verbose: print "      Bad: This a small cap stock with a market cap of {}!".format(marketCap)
+    if verbose: print ("      Bad: This a small cap stock with a market cap of {}!".format(marketCap))
     bad = 1
     
   return type, bad
@@ -629,10 +630,10 @@ def checkSector(sectors,industry):
   bad = 0
   for sector in sectors:
     if sector in gs.defensive and gs.market == 'boom':
-      if verbose: print "      Okay: Investing in defensive sector during a boom market!"
+      if verbose: print ("      Okay: Investing in defensive sector during a boom market!")
       bad = 0.5
     elif sector in gs.cyclical and gs.market == 'fair':
-      if verbose: print "      Bad: Investing in cyclical sector during a fair market!"
+      if verbose: print ("      Bad: Investing in cyclical sector during a fair market!")
       bad = 1
   return bad
 
@@ -645,14 +646,14 @@ def checkNI(netIncome):
   
   for i in reversed(range(1,4)):
     if netIncome[i] < netIncome[i-1]:
-      if verbose: print "      Bad: The net income hasn't been consistently growing for the last 3 years!"
-      if verbose: print "        It's net income dropped from {} to {}, {} years ago.".format(netIncome[i-1],netIncome[i],4-i)
+      if verbose: print ("      Bad: The net income hasn't been consistently growing for the last 3 years!")
+      if verbose: print ("        It's net income dropped from {} to {}, {} years ago.".format(netIncome[i-1],netIncome[i],4-i))
       bad = 1
     NIChange[i-1] = (netIncome[i] - netIncome[i-1]) / np.float(netIncome[i-1])
   
   if NIChange[-1] < 0.2:
-    if verbose: print "      Bad: It has not grown its income by 20% in the last year!"
-    if verbose: print "        It's last year growth rate was {}%.".format(round(NIChange[-1]*100,2))
+    if verbose: print ("      Bad: It has not grown its income by 20% in the last year!")
+    if verbose: print ("        It's last year growth rate was {}%.".format(round(NIChange[-1]*100,2)))
     bad += 1
   
   return NIChange, bad
@@ -669,24 +670,24 @@ def checkRevenueProfit(revenue,profit,NIChange):
   pbad = 0
   for i in reversed(range(1,4)):
     if revenue[i] < revenue[i-1]:
-      if verbose: print "      Bad: Its revenue hasn't been consistently growing for the last 3 years!"
-      if verbose: print "        It's revenue dropped from {} to {}, {} years ago.".format(revenue[i-1],revenue[i],4-i)
+      if verbose: print ("      Bad: Its revenue hasn't been consistently growing for the last 3 years!")
+      if verbose: print ("        It's revenue dropped from {} to {}, {} years ago.".format(revenue[i-1],revenue[i],4-i))
       rbad = 1
     if profit[i] < profit[i-1]:
-      if verbose: print "      Bad: Its profit hasn't been consistently growing for the last 3 years!"
-      if verbose: print "        It's profit dropped from {} to {}, {} years ago.".format(profit[i-1],profit[i],4-i)
+      if verbose: print ("      Bad: Its profit hasn't been consistently growing for the last 3 years!")
+      if verbose: print ("        It's profit dropped from {} to {}, {} years ago.".format(profit[i-1],profit[i],4-i))
       pbad = 1
     
     RChange[i-1] = (revenue[i] - revenue[i-1]) / np.float(revenue[i-1])
     PChange[i-1] = (profit[i] - profit[i-1]) / np.float(profit[i-1])
     
     if np.abs(RChange[i-1] - NIChange[i-1]) > gs.tol:
-      if verbose: print "      Bad: Its change in net income is not equivalent to its change in revenue"
-      if verbose: print "       It's net income changed by {}%, and its revenue changed by {}%".format(round(NIChange[i-1]*100,2),round(RChange[i-1]*100,2))
+      if verbose: print ("      Bad: Its change in net income is not equivalent to its change in revenue")
+      if verbose: print ("       It's net income changed by {}%, and its revenue changed by {}%".format(round(NIChange[i-1]*100,2),round(RChange[i-1]*100,2)))
       rnbad = 1
     if np.abs(PChange[i-1] - NIChange[i-1]) > gs.tol:
-      if verbose: print "      Bad: Its change in net income is not equivalent to its change in profit"
-      if verbose: print "        It's net income changed by {}%, and its profit changed by {}%".format(round(NIChange[i-1]*100,2),round(PChange[i-1]*100,2))
+      if verbose: print ("      Bad: Its change in net income is not equivalent to its change in profit")
+      if verbose: print ("        It's net income changed by {}%, and its profit changed by {}%".format(round(NIChange[i-1]*100,2),round(PChange[i-1]*100,2)))
       pnbad = 1
   return RChange, PChange, rnbad + pnbad + pbad + rbad
   
@@ -698,13 +699,13 @@ def checkOCF(operatingCF):
   OCFChange = np.zeros(3)
   for i in reversed(range(1,4)):
     if operatingCF[i] < operatingCF[i-1]:
-      if verbose: print "      Bad: Its operating cash flow is decreasing!"
-      if verbose: print "        It's operating cash flow dropped from {} to {}, {} years ago.".format(operatingCF[i-1], operatingCF[i], 4-i)
+      if verbose: print ("      Bad: Its operating cash flow is decreasing!")
+      if verbose: print ("        It's operating cash flow dropped from {} to {}, {} years ago.".format(operatingCF[i-1], operatingCF[i], 4-i))
       bad = 1
     OCFChange[i-1] = (operatingCF[i] - operatingCF[i-1]) / np.float(operatingCF[i-1])
 
   if operatingCF[-1] < 0:
-    if verbose: print "      Bad: It has a negative operating cash flow of {}!".format(operatingCF[-1])
+    if verbose: print ("      Bad: It has a negative operating cash flow of {}!".format(operatingCF[-1]))
     bad += 1
   
   return OCFChange, bad
@@ -719,8 +720,8 @@ def checkEPS(EPSbyQuarter,EPSbyYear):
   bad = 0
   
   if EPSGrowthRate < 0.2:
-    if verbose: print "      Bad: It has not grown its EPS by 20% in the last year!"
-    if verbose: print "        It's last year EPS growth rate was {}%.".format(round(EPSGrowthRate*100,2))
+    if verbose: print ("      Bad: It has not grown its EPS by 20% in the last year!")
+    if verbose: print ("        It's last year EPS growth rate was {}%.".format(round(EPSGrowthRate*100,2)))
     bad += 1
 
   for i in reversed(range(1,4)):
@@ -729,8 +730,8 @@ def checkEPS(EPSbyQuarter,EPSbyYear):
   LTEPSGrowthRate = LTEPSGrowthRate.mean()
   
   if LTEPSGrowthRate < 0.1:
-    if verbose: print "      Bad: Its long-term EPS growth rate is less than 10%"
-    if verbose: print "        It's long term EPS growth rate is {}%".format(round(LTEPSGrowthRate*100,2))
+    if verbose: print ("      Bad: Its long-term EPS growth rate is less than 10%")
+    if verbose: print ("        It's long term EPS growth rate is {}%".format(round(LTEPSGrowthRate*100,2)))
     bad += 1
 
   return EPSGrowthRate, LTEPSGrowthRate, bad
@@ -745,11 +746,11 @@ def checkROE(netIncome, shareholdersEq):
     ROE[i] = netIncome[i] / np.float(shareholdersEq[i])
   
   if ROE.mean() < 0.12:
-    if verbose: print "      Bad: Its average ROE for the last 4 years is less than 12% and is {}%".format(round(ROE.mean()*100,2))
+    if verbose: print ("      Bad: Its average ROE for the last 4 years is less than 12% and is {}%".format(round(ROE.mean()*100,2)))
     bad += 1
   
   if ROE[-1] < 0.15:
-    if verbose: print "      Bad: Its last year ROE was less than 15% and is at {}%".format(round(ROE[-1]*100,2))
+    if verbose: print ("      Bad: Its last year ROE was less than 15% and is at {}%".format(round(ROE[-1]*100,2)))
     bad += 1
   
   return ROE, bad
@@ -763,8 +764,8 @@ def checkROE(netIncome, shareholdersEq):
 def checkCR(freeCF, LTDebt, currentAssets, currentLiabilities, CRy):
   bad = 0
   if freeCF*3 < LTDebt:
-    if verbose: print "      Bad: It doesn't have enough free cash flow to settle its long-term debts in 3 years"
-    if verbose: print "        3x its free cash flow is ${} million, and its long-term debt is ${} million".format(freeCF*3, LTDebt) 
+    if verbose: print ("      Bad: It doesn't have enough free cash flow to settle its long-term debts in 3 years")
+    if verbose: print ("        3x its free cash flow is ${} million, and its long-term debt is ${} million".format(freeCF*3, LTDebt))
     bad += 1
   
   CR = 0
@@ -774,10 +775,10 @@ def checkCR(freeCF, LTDebt, currentAssets, currentLiabilities, CRy):
     CR = CRy
   
   if CR < 1:
-    if verbose: print "      Bad: Its current ratio is less than 1 and is {}!".format(CR)
+    if verbose: print ("      Bad: Its current ratio is less than 1 and is {}!".format(CR))
     bad += 1
   elif CR < 1.5:
-    if verbose: print "      Ok: Its current short-term debt is {} million and its current CR is {}".format(currentLiabilities, CR)
+    if verbose: print ("      Ok: Its current short-term debt is {} million and its current CR is {}".format(currentLiabilities, CR))
     bad += 0.5
   
   return CR, bad
@@ -790,7 +791,7 @@ def checkCR(freeCF, LTDebt, currentAssets, currentLiabilities, CRy):
 def checkPEG(price, EPS, PEG):
   PE = price/EPS
   if PEG > 1:
-    if verbose: print "      Bad: It has a PEG ratio of {} which is greater than 1!".format(PEG) 
+    if verbose: print ("      Bad: It has a PEG ratio of {} which is greater than 1!".format(PEG))
     return 1
   return 0
 
@@ -834,10 +835,10 @@ def getIntrinsicPrice(cash,debt,STDebt,LTDebt,beta,estInterestRate,busTaxRate,ma
 
   valuation = 'CorrectlyValued'
   if pctDiff > 1:
-    #print "Undervalued: This stock's market value is {}% of its intrinsic value".format(round(pctDiff,2))
+    #print ("Undervalued: This stock's market value is {}% of its intrinsic value".format(round(pctDiff,2)))
     valuation = 'Undervalued'
   elif pctDiff < 1:
-    #print "Overvalued: This stock's market value is {}% of its intrinsic value".format(round(pctDiff,2))
+    #print ("Overvalued: This stock's market value is {}% of its intrinsic value".format(round(pctDiff,2)))
     valuation = 'Overvalued'
   
   return intrinsicValPS, pctDiff, valuation
@@ -847,13 +848,13 @@ def checkFCF(financingCF):
   FCFChange = np.zeros(3)
   for i in reversed(range(1,4)):
     if financingCF[i] > financingCF[i-1]:
-      if verbose: print "      Bad: Its financing cash flow is increasing!"
-      if verbose: print "        It's financing cash flow increased from {} to {}, {} years ago.".format(financingCF[i-1], financingCF[i], 4-i)
+      if verbose: print ("      Bad: Its financing cash flow is increasing!")
+      if verbose: print ("        It's financing cash flow increased from {} to {}, {} years ago.".format(financingCF[i-1], financingCF[i], 4-i))
       bad = 0.5
     FCFChange[i-1] = (financingCF[i] - financingCF[i-1]) / np.float(financingCF[i-1])
 
   if financingCF[-1] > 0:
-    if verbose: print "      Bad: It has a positive financing cash flow of {}!".format(financingCF[-1])
+    if verbose: print ("      Bad: It has a positive financing cash flow of {}!".format(financingCF[-1]))
     bad += 1
   
   return FCFChange, bad
@@ -863,20 +864,20 @@ def checkICF(investingCF):
   ICFChange = np.zeros(3)
   for i in reversed(range(1,4)):
     if investingCF[i] > investingCF[i-1]:
-      if verbose: print "      Bad: Its investing cash flow is increasing!"
-      if verbose: print "        It's investing cash flow increased from {} to {}, {} years ago.".format(investingCF[i-1], investingCF[i], 4-i)
+      if verbose: print ("      Bad: Its investing cash flow is increasing!")
+      if verbose: print ("        It's investing cash flow increased from {} to {}, {} years ago.".format(investingCF[i-1], investingCF[i], 4-i))
       bad = 0.5
     ICFChange[i-1] = (investingCF[i] - investingCF[i-1]) / np.float(investingCF[i-1])
 
   if investingCF[-1] > 0:
-    if verbose: print "      Bad: It has a positive investing cash flow of {}!".format(investingCF[-1])
+    if verbose: print ("      Bad: It has a positive investing cash flow of {}!".format(investingCF[-1]))
     bad += 1
   
   return ICFChange, bad  
 
 def getAnnualColumns(DF):
-  month = 01
-  year = 01
+  month = '01'
+  year = '01'
 
   for val in DF.columns.values:
     indx = val.find('20')
@@ -900,8 +901,8 @@ def getAnnualColumns(DF):
   return years_of_interest
 
 def getQuarterlyColumns(DF):
-  month = 01
-  year = 01
+  month = '01'
+  year = '01' 
 
   for val in DF.columns.values:
     indx = val.find('20')
@@ -994,13 +995,13 @@ def getFinancialInfo(stock, verbose = False, save = True):
 def analyzeStock(stock,verbose,save):
   gen_data, DF, ADF, QDF, years, quarters = getFinancialInfo(stock,verbose,save)
   if verbose:
-    print "{} ({}) - {}".format(gen_data['name'],gen_data['stock'],gen_data['date'])
-    print "  Price: ${} {}".format(gen_data['price'],gen_data['currency'])
-    print "  Intrinsic Price: ${} {}".format(round(gen_data['intrinsicPrice'],2),gen_data['currency'])
-    print "  Dividend: ${} (Yield: {}%)".format(gen_data['dividend'],gen_data['yield'])
-    print "  Valuation: {}".format(gen_data['valuation'])
-    print "  Yahoo Recommendation: {}".format(gen_data['recommendation'])
-    print "    Problems:"  
+    print ("{} ({}) - {}".format(gen_data['name'],gen_data['stock'],gen_data['date']))
+    print ("  Price: ${} {}".format(gen_data['price'],gen_data['currency']))
+    print ("  Intrinsic Price: ${} {}".format(round(gen_data['intrinsicPrice'],2),gen_data['currency']))
+    print ("  Dividend: ${} (Yield: {}%)".format(gen_data['dividend'],gen_data['yield']))
+    print ("  Valuation: {}".format(gen_data['valuation']))
+    print ("  Yahoo Recommendation: {}".format(gen_data['recommendation']))
+    print ("    Problems:" )
 
   redFlagCtr = 0
 
@@ -1051,10 +1052,10 @@ def analyzeStock(stock,verbose,save):
   
   # Beta < 1, preferably beta < 0.8
   if gen_data['beta'] > 1:
-    if verbose: print "      Bad: Beta is greater than 1 so stock is volatile ({})!".format(gen_data['beta'])
+    if verbose: print ("      Bad: Beta is greater than 1 so stock is volatile ({})!".format(gen_data['beta']))
     redFlagCtr += 1
   elif gen_data['beta'] > 0.8:
-    if verbose: print "      OK: Beta is between 0.8 and 1 so stock is somewhat volatile but less volatile than the market ({})!".format(gen_data['beta'])
+    if verbose: print ("      OK: Beta is between 0.8 and 1 so stock is somewhat volatile but less volatile than the market ({})!".format(gen_data['beta']))
     redFlagCtr += 0.5
 
   ## Check to make sure that investing activities are negative and decreasing
@@ -1067,7 +1068,7 @@ def analyzeStock(stock,verbose,save):
   FCFChange, ctr = checkFCF(financingCF)
   redFlagCtr += ctr
      
-  if verbose: print "    {} has a total of {} red flags!".format(gen_data['stock'],redFlagCtr)
+  if verbose: print ("    {} has a total of {} red flags!".format(gen_data['stock'],redFlagCtr))
   gen_data['redFlags'] = redFlagCtr
 
   # Alternative Criteria #
@@ -1089,7 +1090,7 @@ def analyzeStock(stock,verbose,save):
     gen_data['inventoriesPct'] = gen_data['inventories']/np.float(gen_data['currentAssets'])*100
     gen_data['ARPct'] = gen_data['AR']/np.float(gen_data['currentAssets'])*100
   else:
-    if verbose: print "    Note: No current assets so using total assets in denominator"
+    if verbose: print ("    Note: No current assets so using total assets in denominator")
     totalAssets = getValue(QDF,"Total assets",quarters[-1])
     gen_data['inventoriesPct'] = gen_data['inventories']/totalAssets*100.0
     gen_data['ARPct'] = gen_data['AR']/totalAssets*100.0
@@ -1097,20 +1098,20 @@ def analyzeStock(stock,verbose,save):
   if gen_data['currentLiabilities'] != 0:
     gen_data['APPct'] = gen_data['AP']/np.float(gen_data['currentLiabilities'])*100
   else:
-    if verbose: print "    Note: No current assets so using total liabilities in denominator"
+    if verbose: print ("    Note: No current assets so using total liabilities in denominator")
     totalLiabilities = getValue(QDF,"Total liabilities",quarters[-1])
     gen_data['APPct'] = gen_data['AP']/totalLiabilities*100
 
   if verbose:
-    print "    Its inventories is equal to {}% of its current assets".format(round(gen_data['inventoriesPct'],2))
-    print "    Its accounts receivable is equal to {}% of its current assets".format(round(gen_data['ARPct'],2))
-    print "    Its accounts payable is equal to {}% of its current liabilities".format(round(gen_data['APPct'],2))
-    print "    Its has intangible assets of ${} million".format(gen_data['intangibleAssets'])  
+    print ("    Its inventories is equal to {}% of its current assets".format(round(gen_data['inventoriesPct'],2)))
+    print ("    Its accounts receivable is equal to {}% of its current assets".format(round(gen_data['ARPct'],2)))
+    print ("    Its accounts payable is equal to {}% of its current liabilities".format(round(gen_data['APPct'],2)))
+    print ("    Its has intangible assets of ${} million".format(gen_data['intangibleAssets']))
 
   if verbose:
     for k,v in gen_data.items():
-      print k,v
-    print '\n',DF
+      print (k,v)
+    print ('\n',DF)
   
   if save:
     DF.to_csv('DataSheets/' + gen_data['date'] + '_' + gen_data['stock'] + '_Financials.csv',sep=',')
@@ -1178,9 +1179,9 @@ def analyzeETF(stock,verbose,save):
 
   
   if verbose:
-    print "\n\n{} - {}".format(stock,date)
+    print ("\n\n{} - {}".format(stock,date))
     for k,v in gen_data.items():
-      print k,v
+      print (k,v)
 
   if save:
     f = open('DataSheets/' + date + '_' + stock + '_ETF_Info.csv','wb')

@@ -27,15 +27,15 @@ if __name__ == '__main__':
 	total_value = 0
 	for stock_type, stocks in stock_types.items():
 		type_value = 0
-		print "\n"
+		print ("\n")
 		for stock, amt in stocks.items():
 			try:
 				price, currency = fa.getMarketPrice(stock)
 				type_value += price*amt
 				total_value += price*amt
-				print "    {s}: ${v} CAD (${p} {c} ea.)".format(s=stock, v=price*amt, p=price, c=currency)	
+				print ("    {s}: ${v} CAD (${p} {c} ea.)".format(s=stock, v=price*amt, p=price, c=currency))
 			except:
-				print "    {s}: Could not acquire price!".format(s=stock)
+				print ("    {s}: Could not acquire price!".format(s=stock))
 			
-		print "  {s}: ${p} CAD".format(s=stock_type, p=type_value)
-	print "Total Value: ${} CAD".format(total_value)
+		print ("  {s}: ${p} CAD".format(s=stock_type, p=type_value))
+	print ("Total Value: ${} CAD".format(total_value))

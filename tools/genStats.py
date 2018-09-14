@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 ###################################### General Information ######################################
 
 # Year to analyze

@@ -70,6 +70,7 @@ if __name__ == '__main__':
 
     if indx != -1 and not new_file and not update and len(df[df['stock'] == stock]) >= 1 and df[df['stock'] == stock]['date'].values[0] == date:
         continue
+    
     print 'Analyzing {}'.format(stock)
 
     try:

@@ -370,23 +370,29 @@ def getEffIntRateonDebt(t):
         
   if verbose: print ("Parsing " + url)
          
-  headers={'User-Agent':user_agent} 
+  headers={'User-Agent':user_agent}
 
   req = urllib2.Request(url,None,headers) #The assembled request
-  response = urllib2.urlopen(req)
-  content = response.read()
   
-  soup = BeautifulSoup(content, 'html.parser')
+  try:
+    req = urllib2.Request(url,None,headers) #The assembled request
+    response = urllib2.urlopen(req, timeout=2)
+    content = response.read()
+
+    soup = BeautifulSoup(content, 'html.parser')
   
-  desc = soup.findAll(attrs={'name':'description'})
-  desc = desc[0]['content'].encode('utf-8')
+    desc = soup.findAll(attrs={'name':'description'})
+    desc = desc[0]['content'].encode('utf-8')
   
-  indx = desc.find('Effective Interest Rate on Debt %:')
-  if indx is not -1:
-    indx += len('Effective Interest Rate on Debt %:') + 1
-    int_rate = float(desc[indx:indx+4])/100.0
-    if int_rate > 0.01:
-      return int_rate
+    indx = desc.find('Effective Interest Rate on Debt %:')
+    if indx is not -1:
+      indx += len('Effective Interest Rate on Debt %:') + 1
+      int_rate = float(desc[indx:indx+4])/100.0
+      if int_rate > 0.01:
+        return int_rate
+  except Exception as e:
+    print 'Url Error:',e
+
   if verbose: print ("Effective interest rate on debt couldn't be determined, using 5%")
   return 0.05
 
@@ -909,8 +915,8 @@ def checkICF(investingCF):
   return ICFChange, bad  
 
 def getAnnualColumns(DF):
-  month = '01'
-  year = '01'
+  month = 01
+  year = 01
 
   for val in DF.columns.values:
     indx = val.find('20')
@@ -934,8 +940,8 @@ def getAnnualColumns(DF):
   return years_of_interest
 
 def getQuarterlyColumns(DF):
-  month = '01'
-  year = '01' 
+  month = 01
+  year = 01 
 
   for val in DF.columns.values:
     indx = val.find('20')
